@@ -5,814 +5,1736 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>National Cipher Challenge</title>
+<title>National Cipher Challenge Quiz</title>
 
 <style>
-    * {
-        box-sizing: border-box;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #10131a;
+    color: white;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    background: #171c27;
+    border-bottom: 1px solid #2c3445;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    color: #aeb7c8;
+    margin-top: 8px;
+}
+
+.container {
+    width: 92%;
+    max-width: 850px;
+    margin: 35px auto;
+}
+
+/* LEVEL SCREEN */
+
+#levelScreen {
+    text-align: center;
+}
+
+#levelScreen h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+#levelScreen p {
+    color: #aeb7c8;
+    margin-bottom: 30px;
+}
+
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.level-card {
+    background: #191f2c;
+    border: 1px solid #30394b;
+    border-radius: 15px;
+    padding: 25px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.level-card:hover {
+    transform: translateY(-4px);
+    border-color: #6c8cff;
+    background: #20283a;
+}
+
+.level-card h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.level-card p {
+    margin: 0;
+    color: #aeb7c8;
+}
+
+.level-number {
+    font-size: 35px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* QUIZ */
+
+#quizScreen {
+    display: none;
+}
+
+.quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#levelName {
+    font-weight: bold;
+    color: #8fa8ff;
+}
+
+#questionNumber {
+    color: #aeb7c8;
+}
+
+.progress-container {
+    width: 100%;
+    height: 9px;
+    background: #272e3b;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    background: #6c8cff;
+    transition: width 0.3s;
+}
+
+.question-box {
+    background: #191f2c;
+    border: 1px solid #30394b;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+#question {
+    font-size: 24px;
+    line-height: 1.4;
+    margin-top: 0;
+}
+
+.cipher-text {
+    background: #0d1016;
+    border: 1px solid #30394b;
+    border-radius: 10px;
+    padding: 18px;
+    margin: 20px 0;
+    font-family: monospace;
+    font-size: 21px;
+    word-break: break-word;
+}
+
+.options {
+    display: grid;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.option {
+    background: #242b39;
+    color: white;
+    border: 1px solid #394356;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s;
+}
+
+.option:hover {
+    background: #30394b;
+}
+
+.option.correct {
+    background: #174d32;
+    border-color: #35c77a;
+}
+
+.option.wrong {
+    background: #542323;
+    border-color: #ef5b5b;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    background: #0d1016;
+    border: 1px solid #394356;
+    color: white;
+    border-radius: 10px;
+    font-size: 17px;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: #6c8cff;
+}
+
+.submit-btn,
+.next-btn,
+.restart-btn,
+.back-btn {
+    margin-top: 18px;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.submit-btn,
+.next-btn {
+    background: #6c8cff;
+    color: white;
+}
+
+.submit-btn:hover,
+.next-btn:hover {
+    background: #819aff;
+}
+
+.next-btn {
+    display: none;
+}
+
+.back-btn,
+.restart-btn {
+    background: #292f3d;
+    color: white;
+}
+
+.back-btn:hover,
+.restart-btn:hover {
+    background: #373f50;
+}
+
+.feedback {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 10px;
+    display: none;
+    line-height: 1.5;
+}
+
+.feedback.correct {
+    display: block;
+    background: #123c28;
+    border: 1px solid #278c58;
+}
+
+.feedback.wrong {
+    display: block;
+    background: #471f1f;
+    border: 1px solid #a84646;
+}
+
+/* RESULTS */
+
+#resultScreen {
+    display: none;
+    text-align: center;
+}
+
+.result-box {
+    background: #191f2c;
+    border: 1px solid #30394b;
+    border-radius: 15px;
+    padding: 40px 25px;
+}
+
+.result-box h2 {
+    font-size: 32px;
+}
+
+#finalScore {
+    font-size: 55px;
+    font-weight: bold;
+    color: #8fa8ff;
+    margin: 20px 0;
+}
+
+#resultMessage {
+    color: #c2c9d6;
+    font-size: 18px;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    header h1 {
+        font-size: 25px;
     }
 
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #10141c;
-        color: #ffffff;
-        min-height: 100vh;
+    .level-grid {
+        grid-template-columns: 1fr;
     }
 
-    .header {
-        background: #171d29;
-        border-bottom: 1px solid #303847;
+    .question-box {
         padding: 20px;
-        text-align: center;
     }
 
-    .header h1 {
-        margin: 0;
-        font-size: 28px;
-    }
-
-    .header p {
-        margin: 8px 0 0;
-        color: #aeb7c7;
-    }
-
-    .container {
-        width: min(900px, 92%);
-        margin: 35px auto;
-    }
-
-    .quiz-card {
-        background: #191f2b;
-        border: 1px solid #303847;
-        border-radius: 18px;
-        padding: 30px;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    }
-
-    .top-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        gap: 15px;
-    }
-
-    .question-number {
-        color: #7db7ff;
-        font-weight: bold;
-    }
-
-    .score {
-        color: #aeb7c7;
-    }
-
-    .progress-container {
-        width: 100%;
-        height: 8px;
-        background: #303847;
-        border-radius: 20px;
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    .progress {
-        height: 100%;
-        width: 0%;
-        background: #4c9aff;
-        transition: width 0.3s;
-    }
-
-    .question {
-        font-size: 23px;
-        line-height: 1.5;
-        margin-bottom: 25px;
-        white-space: pre-line;
+    #question {
+        font-size: 20px;
     }
 
     .cipher-text {
-        background: #0d1118;
-        border: 1px solid #343d4d;
-        padding: 18px;
-        border-radius: 10px;
-        font-family: "Courier New", monospace;
-        font-size: 20px;
-        margin: 15px 0 25px;
-        word-break: break-word;
-    }
-
-    .options {
-        display: grid;
-        gap: 12px;
-    }
-
-    .option {
-        width: 100%;
-        text-align: left;
-        padding: 16px;
-        border-radius: 10px;
-        border: 1px solid #3a4353;
-        background: #222936;
-        color: white;
-        cursor: pointer;
-        font-size: 16px;
-        transition: 0.2s;
-    }
-
-    .option:hover {
-        background: #2b3444;
-        border-color: #5b9fff;
-        transform: translateY(-1px);
-    }
-
-    .option.selected {
-        border-color: #5b9fff;
-        background: #263c5c;
-    }
-
-    .option.correct {
-        background: #174d32;
-        border-color: #37c77a;
-    }
-
-    .option.wrong {
-        background: #5a2025;
-        border-color: #ff5b68;
-    }
-
-    .text-answer {
-        width: 100%;
-        padding: 16px;
-        border-radius: 10px;
-        border: 1px solid #3a4353;
-        background: #0f141c;
-        color: white;
         font-size: 18px;
-        outline: none;
     }
-
-    .text-answer:focus {
-        border-color: #5b9fff;
-    }
-
-    .submit-button,
-    .next-button,
-    .restart-button {
-        margin-top: 22px;
-        padding: 14px 24px;
-        border: none;
-        border-radius: 10px;
-        background: #4c9aff;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .submit-button:hover,
-    .next-button:hover,
-    .restart-button:hover {
-        background: #367fdc;
-    }
-
-    .feedback {
-        margin-top: 18px;
-        padding: 15px;
-        border-radius: 10px;
-        display: none;
-        line-height: 1.5;
-    }
-
-    .feedback.correct-feedback {
-        display: block;
-        background: #143b28;
-        border: 1px solid #2ebd70;
-        color: #9ff0c4;
-    }
-
-    .feedback.wrong-feedback {
-        display: block;
-        background: #481b20;
-        border: 1px solid #e44b58;
-        color: #ffb0b7;
-    }
-
-    .final-screen {
-        text-align: center;
-        display: none;
-    }
-
-    .final-screen h2 {
-        font-size: 35px;
-        margin-bottom: 10px;
-    }
-
-    .final-score {
-        font-size: 65px;
-        font-weight: bold;
-        color: #62a8ff;
-        margin: 25px 0;
-    }
-
-    .rating {
-        color: #b9c2d0;
-        font-size: 18px;
-        line-height: 1.6;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    @media (max-width: 600px) {
-        .quiz-card {
-            padding: 20px;
-        }
-
-        .question {
-            font-size: 19px;
-        }
-
-        .cipher-text {
-            font-size: 17px;
-        }
-
-        .header h1 {
-            font-size: 23px;
-        }
-    }
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
+<header>
     <h1>🔐 National Cipher Challenge</h1>
-    <p>Team Training Quiz</p>
-</div>
+    <p>Test your code-breaking skills</p>
+</header>
 
 <div class="container">
 
-    <div class="quiz-card" id="quizCard">
+    <!-- LEVEL SCREEN -->
 
-        <div class="top-row">
-            <div class="question-number" id="questionNumber">
-                Question 1 of 20
+    <div id="levelScreen">
+
+        <h2>Choose Your Level</h2>
+        <p>Each level contains 20 questions.</p>
+
+        <div class="level-grid">
+
+            <div class="level-card" onclick="startLevel(0)">
+                <div class="level-number">1</div>
+                <h3>🟢 Beginner</h3>
+                <p>Basic Caesar, Atbash and simple patterns.</p>
             </div>
 
-            <div class="score" id="score">
-                Score: 0
+            <div class="level-card" onclick="startLevel(1)">
+                <div class="level-number">2</div>
+                <h3>🔵 Easy</h3>
+                <p>More difficult shifts and substitution clues.</p>
             </div>
+
+            <div class="level-card" onclick="startLevel(2)">
+                <div class="level-number">3</div>
+                <h3>🟡 Medium</h3>
+                <p>Frequency analysis and trickier ciphers.</p>
+            </div>
+
+            <div class="level-card" onclick="startLevel(3)">
+                <div class="level-number">4</div>
+                <h3>🟠 Hard</h3>
+                <p>Mixed techniques and longer ciphertexts.</p>
+            </div>
+
+            <div class="level-card" onclick="startLevel(4)">
+                <div class="level-number">5</div>
+                <h3>🔴 Cipher Master</h3>
+                <p>Very challenging National Cipher Challenge-style problems.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+
+    <div id="quizScreen">
+
+        <div class="quiz-top">
+            <span id="levelName"></span>
+            <span id="questionNumber"></span>
         </div>
 
         <div class="progress-container">
-            <div class="progress" id="progress"></div>
+            <div id="progressBar"></div>
         </div>
 
-        <div id="questionArea"></div>
+        <div class="question-box">
 
-        <div id="feedback" class="feedback"></div>
+            <h2 id="question"></h2>
 
-        <button id="submitButton" class="submit-button">
-            Check Answer
-        </button>
+            <div id="cipherText" class="cipher-text" style="display:none;"></div>
 
-        <button id="nextButton" class="next-button hidden">
-            Next Question →
+            <div id="answers"></div>
+
+            <div id="feedback" class="feedback"></div>
+
+            <button id="submitBtn" class="submit-btn" onclick="submitAnswer()">
+                Check Answer
+            </button>
+
+            <button id="nextBtn" class="next-btn" onclick="nextQuestion()">
+                Next Question →
+            </button>
+
+        </div>
+
+        <button class="back-btn" onclick="backToLevels()">
+            ← Back to Levels
         </button>
 
     </div>
 
-    <div class="quiz-card final-screen" id="finalScreen">
 
-        <h2>🏆 Quiz Complete!</h2>
+    <!-- RESULT SCREEN -->
 
-        <p>Your final score:</p>
+    <div id="resultScreen">
 
-        <div class="final-score" id="finalScore">
-            0 / 20
+        <div class="result-box">
+
+            <h2>🎉 Level Complete!</h2>
+
+            <div id="finalScore">0 / 20</div>
+
+            <p id="resultMessage"></p>
+
+            <button class="restart-btn" onclick="restartLevel()">
+                🔄 Try Again
+            </button>
+
+            <button class="back-btn" onclick="backToLevels()">
+                ← Choose Another Level
+            </button>
+
         </div>
-
-        <div class="rating" id="rating"></div>
-
-        <button class="restart-button" onclick="restartQuiz()">
-            Try Again
-        </button>
 
     </div>
 
 </div>
 
+
 <script>
 
-const questions = [
+/* =========================================================
+   LEVEL 1 — BEGINNER
+========================================================= */
 
-    {
-        question: "Decode this Caesar cipher using a shift of 3:",
-        cipher: "KHOOR",
-        type: "text",
-        answer: "HELLO",
-        explanation: "Each letter is moved 3 places backwards: K→H, H→E, O→L, O→L, R→O."
-    },
+const level1 = [
 
-    {
-        question: "Decode this Caesar cipher using a shift of 3:",
-        cipher: "WKH VHFUHW",
-        type: "text",
-        answer: "THE SECRET",
-        explanation: "Move every letter 3 places backwards to reveal THE SECRET."
-    },
+{
+q:"What does the Caesar cipher do?",
+type:"choice",
+options:["Moves letters by a fixed amount","Reverses every word","Deletes letters","Changes letters into numbers"],
+answer:"Moves letters by a fixed amount"
+},
 
-    {
-        question: "If D encrypts to G, what shift is being used?",
-        type: "options",
-        options: [
-            "A shift of 1",
-            "A shift of 2",
-            "A shift of 3",
-            "A shift of 4"
-        ],
-        answer: 2,
-        explanation: "D → E → F → G, so the encryption shift is 3."
-    },
+{
+q:"Decode this Caesar cipher using a shift of 3:",
+cipher:"KHOOR",
+type:"text",
+answer:"HELLO"
+},
 
-    {
-        question: "Using the Atbash cipher, where A↔Z, B↔Y and C↔X, decode:",
-        cipher: "GSV",
-        type: "text",
-        answer: "THE",
-        explanation: "Atbash reverses the alphabet. G becomes T, S becomes H and V becomes E."
-    },
+{
+q:"Decode this:",
+cipher:"WKH",
+type:"choice",
+options:["THE","YOU","CAT","AND"],
+answer:"THE"
+},
 
-    {
-        question: "Encode the word CIPHER using the Atbash cipher.",
-        type: "text",
-        answer: "XRKSVI",
-        explanation: "C→X, I→R, P→K, H→S, E→V and R→I."
-    },
+{
+q:"What is the Caesar shift from D to G?",
+type:"choice",
+options:["1","2","3","4"],
+answer:"3"
+},
 
-    {
-        question: "In an English substitution cipher, which letter is often the most common?",
-        type: "options",
-        options: [
-            "Q",
-            "E",
-            "X",
-            "Z"
-        ],
-        answer: 1,
-        explanation: "E is commonly the most frequent letter in English, making it useful in frequency analysis."
-    },
+{
+q:"Decode the Atbash cipher:",
+cipher:"GSV",
+type:"choice",
+options:["THE","CAT","DOG","YOU"],
+answer:"THE"
+},
 
-    {
-        question: "The ciphertext contains the pattern XQX. What useful thing can you learn from the repeated letters?",
-        type: "options",
-        options: [
-            "The first and third plaintext letters are probably the same",
-            "The word must contain three different letters",
-            "The word must be exactly THE",
-            "The cipher must be a Caesar cipher"
-        ],
-        answer: 0,
-        explanation: "In a simple substitution cipher, the same ciphertext letter normally represents the same plaintext letter."
-    },
+{
+q:"In English, which letter is often the most common?",
+type:"choice",
+options:["E","Q","Z","X"],
+answer:"E"
+},
 
-    {
-        question: "A ciphertext word has the pattern 1-2-3-3-2. Which English word has the same letter pattern?",
-        type: "options",
-        options: [
-            "SHEEP",
-            "APPLE",
-            "LEVEL",
-            "THERE"
-        ],
-        answer: 0,
-        explanation: "SHEEP has S-H-E-E-P, giving the pattern 1-2-3-3-2."
-    },
+{
+q:"If XQX is a substitution cipher pattern, what can you tell?",
+type:"choice",
+options:[
+"The first and third letters are probably the same",
+"All letters are different",
+"The word must contain E",
+"It must be a Caesar cipher"
+],
+answer:"The first and third letters are probably the same"
+},
 
-    {
-        question: "If X = T, Q = H and Z = E, what does XQZ represent?",
-        type: "options",
-        options: [
-            "THE",
-            "TEE",
-            "THA",
-            "HET"
-        ],
-        answer: 0,
-        explanation: "Replacing X with T, Q with H and Z with E gives THE."
-    },
+{
+q:"Which two letters can form common one-letter English words?",
+type:"choice",
+options:["A and I","B and C","X and Z","Q and W"],
+answer:"A and I"
+},
 
-    {
-        question: "If GSR represents THE, what can you immediately learn?",
-        type: "options",
-        options: [
-            "G represents T, S represents H and R represents E",
-            "G represents H, S represents E and R represents T",
-            "The cipher must be Caesar",
-            "The message cannot be solved"
-        ],
-        answer: 0,
-        explanation: "A known plaintext word gives you three useful letter substitutions."
-    },
+{
+q:"What does a substitution cipher replace?",
+type:"choice",
+options:["Letters with other letters or symbols","Only numbers","Whole paragraphs","Spaces only"],
+answer:"Letters with other letters or symbols"
+},
 
-    {
-        question: "Decode this message using the same substitution where GSR = THE:",
-        cipher: "GSR RH Z HVXIVG",
-        type: "text",
-        answer: "THE IS A SECRET",
-        explanation: "The substitution maps the ciphertext to THE IS A SECRET."
-    },
+{
+q:"If X=T, Q=H and Z=E, what does XQZ spell?",
+type:"choice",
+options:["THE","CAT","DOG","YOU"],
+answer:"THE"
+},
 
-    {
-        question: "A ciphertext contains the words ABCD EFGH IJKL EFGH MNOP. What should you investigate first?",
-        type: "options",
-        options: [
-            "The repeated word EFGH",
-            "The colour of the paper",
-            "The longest word",
-            "The number of spaces"
-        ],
-        answer: 0,
-        explanation: "Repeated words can reveal repeated plaintext words and provide useful substitution clues."
-    },
+{
+q:"What is the plaintext?",
+type:"choice",
+options:["The original readable message","The encrypted message","The key","The cipher alphabet"],
+answer:"The original readable message"
+},
 
-    {
-        question: "You suspect that the word THE appears somewhere in a substitution cipher. What technique could you use to test this idea?",
-        type: "options",
-        options: [
-            "A crib",
-            "Random guessing",
-            "Changing the font",
-            "Counting spaces only"
-        ],
-        answer: 0,
-        explanation: "A crib is a guessed piece of plaintext used to help break a cipher."
-    },
+{
+q:"What is ciphertext?",
+type:"choice",
+options:["The encrypted message","The original message","A password","A clue"],
+answer:"The encrypted message"
+},
 
-    {
-        question: "Decode this Caesar cipher:",
-        cipher: "YMJ XJHWJY NX MNIJY",
-        type: "text",
-        answer: "THE SECRET IS HIDET",
-        explanation: "This ciphertext uses a Caesar shift of 5. Note that the final word is intentionally HIDET, so check your answer carefully."
-    },
+{
+q:"Decode with a Caesar shift of 3:",
+cipher:"FDW",
+type:"choice",
+options:["CAT","DOG","FOX","BAT"],
+answer:"CAT"
+},
 
-    {
-        question: "A cipher contains a one-letter word. Which two possibilities are especially common in English?",
-        type: "options",
-        options: [
-            "A and I",
-            "B and C",
-            "X and Z",
-            "Q and J"
-        ],
-        answer: 0,
-        explanation: "A and I are the two common one-letter words in English."
-    },
+{
+q:"What does frequency analysis study?",
+type:"choice",
+options:["How often letters appear","How long words are","The colour of letters","The number of spaces"],
+answer:"How often letters appear"
+},
 
-    {
-        question: "The ciphertext contains ABBCD EFGHI ABBCD. What important clue does the repeated first and third word give you?",
-        type: "options",
-        options: [
-            "Those two ciphertext words probably represent the same plaintext word",
-            "The cipher is definitely Caesar",
-            "The message contains no vowels",
-            "The repeated word must mean THE"
-        ],
-        answer: 0,
-        explanation: "In many substitution systems, identical ciphertext words correspond to identical plaintext words."
-    },
+{
+q:"Which is a common three-letter English word?",
+type:"choice",
+options:["THE","QXZ","ZZQ","XQW"],
+answer:"THE"
+},
 
-    {
-        question: "In a transposition cipher, are the letters usually changed or rearranged?",
-        type: "options",
-        options: [
-            "Changed",
-            "Rearranged",
-            "Deleted",
-            "Translated into numbers"
-        ],
-        answer: 1,
-        explanation: "Transposition ciphers rearrange the positions of letters rather than replacing them with different letters."
-    },
+{
+q:"If a word is repeated many times in ciphertext, what might it be?",
+type:"choice",
+options:["A common word","Always a name","Always a number","Nothing useful"],
+answer:"A common word"
+},
 
-    {
-        question: "You have a very long ciphertext with no spaces. What would make frequency analysis harder?",
-        type: "options",
-        options: [
-            "Not knowing where words begin and end",
-            "Having too many spaces",
-            "Having capital letters",
-            "Knowing the alphabet"
-        ],
-        answer: 0,
-        explanation: "Without spaces, it is harder to identify word patterns and common words."
-    },
+{
+q:"What is the Atbash alphabet based on?",
+type:"choice",
+options:["Reversing the alphabet","Moving letters 3 places","Using numbers","Removing vowels"],
+answer:"Reversing the alphabet"
+},
 
-    {
-        question: "The most common ciphertext letter is Q. Does that prove Q = E?",
-        type: "options",
-        options: [
-            "Yes, always",
-            "No, frequency is only a clue",
-            "Yes, but only in Caesar ciphers",
-            "No, because E never appears in English"
-        ],
-        answer: 1,
-        explanation: "E is often the most common English letter, but frequency alone does not prove that Q represents E."
-    },
+{
+q:"In Atbash, A becomes:",
+type:"choice",
+options:["Z","B","C","Y"],
+answer:"Z"
+},
 
-    {
-        question: "FINAL BOSS: A ciphertext has a frequently repeated 3-letter word, a repeated 4-letter pattern, a one-letter word and Q as its most common letter. What should your team investigate first?",
-        type: "options",
-        options: [
-            "Repeated words and letter frequencies",
-            "The colour of the page",
-            "Only the rarest letter",
-            "The number of characters in the alphabet"
-        ],
-        answer: 0,
-        explanation: "Repeated words, word patterns and letter frequencies provide several useful clues that can be tested against each other."
-    }
+{
+q:"In Atbash, Z becomes:",
+type:"choice",
+options:["A","Y","X","B"],
+answer:"A"
+},
+
+{
+q:"What should you usually look for first when solving a simple substitution cipher?",
+type:"choice",
+options:["Patterns and common words","The longest number","The colour","Random letters"],
+answer:"Patterns and common words"
+}
 
 ];
 
+
+/* =========================================================
+   LEVEL 2 — EASY
+========================================================= */
+
+const level2 = [
+
+{
+q:"Decode the Caesar cipher:",
+cipher:"KHOOR ZRUOG",
+type:"choice",
+options:["HELLO WORLD","GOOD MORNING","SECRET MESSAGE","THE ANSWER"],
+answer:"HELLO WORLD"
+},
+
+{
+q:"Decode using a shift of 3:",
+cipher:"FDW",
+type:"text",
+answer:"CAT"
+},
+
+{
+q:"Decode using a shift of 3:",
+cipher:"GRJ",
+type:"choice",
+options:["DOG","CAT","FOX","PIG"],
+answer:"DOG"
+},
+
+{
+q:"Decode this Caesar cipher:",
+cipher:"PHHW",
+type:"choice",
+options:["MEET","HELP","LOOK","FIND"],
+answer:"MEET"
+},
+
+{
+q:"Decode this:",
+cipher:"WKH FDW",
+type:"choice",
+options:["THE CAT","THE DOG","YOU CAT","A DOG"],
+answer:"THE CAT"
+},
+
+{
+q:"Using Atbash, what does X R K H V I mean?",
+type:"choice",
+options:["CIPHER","SECRET","PUZZLE","CODE"],
+answer:"CIPHER"
+},
+
+{
+q:"In a substitution cipher, what does a repeated pattern like ABBA suggest?",
+type:"choice",
+options:["The first and last letters match","All letters are different","It is Caesar","It has no pattern"],
+answer:"The first and last letters match"
+},
+
+{
+q:"Which word has the pattern 1-2-3-3-2?",
+type:"choice",
+options:["SHEEP","HELLO","APPLE","HOUSE"],
+answer:"SHEEP"
+},
+
+{
+q:"Which word has the pattern 1-2-3-2-4?",
+type:"choice",
+options:["HELLO","HOUSE","APPLE","SHEEP"],
+answer:"HOUSE"
+},
+
+{
+q:"A very common three-letter English word is:",
+type:"choice",
+options:["THE","QXZ","ZQX","XJW"],
+answer:"THE"
+},
+
+{
+q:"If the most common ciphertext letter is Q, what should you assume?",
+type:"choice",
+options:[
+"Q might represent E, but it is not certain",
+"Q definitely represents E",
+"Q is always A",
+"Q cannot represent E"
+],
+answer:"Q might represent E, but it is not certain"
+},
+
+{
+q:"What is a crib in cryptanalysis?",
+type:"choice",
+options:["A guessed piece of plaintext","A type of keyboard","A number key","A cipher machine"],
+answer:"A guessed piece of plaintext"
+},
+
+{
+q:"Why are one-letter words useful?",
+type:"choice",
+options:[
+"They are usually A or I",
+"They are always THE",
+"They are always names",
+"They cannot be solved"
+],
+answer:"They are usually A or I"
+},
+
+{
+q:"Decode:",
+cipher:"VHFUHW",
+type:"choice",
+options:["SECRET","CIPHER","MESSAGE","ANSWER"],
+answer:"SECRET"
+},
+
+{
+q:"Decode:",
+cipher:"FRGH",
+type:"choice",
+options:["CODE","CIPHER","WORD","KEY"],
+answer:"CODE"
+},
+
+{
+q:"What does a frequency table show?",
+type:"choice",
+options:[
+"How often each symbol appears",
+"The order of the alphabet",
+"The cipher key automatically",
+"Only vowels"
+],
+answer:"How often each symbol appears"
+},
+
+{
+q:"If two ciphertext symbols always appear in the same positions as two plaintext letters, this may suggest:",
+type:"choice",
+options:["A substitution relationship","A typo","A password","Nothing"],
+answer:"A substitution relationship"
+},
+
+{
+q:"Which is more useful when starting a substitution cipher?",
+type:"choice",
+options:["Repeated words","Random guessing","Ignoring patterns","Deleting spaces"],
+answer:"Repeated words"
+},
+
+{
+q:"A Caesar cipher is also called a:",
+type:"choice",
+options:["Shift cipher","Mirror cipher","Grid cipher","Number cipher"],
+answer:"Shift cipher"
+},
+
+{
+q:"How many possible Caesar shifts are there for the 26-letter alphabet, including shift 0?",
+type:"choice",
+options:["26","10","52","13"],
+answer:"26"
+}
+
+];
+
+
+/* =========================================================
+   LEVEL 3 — MEDIUM
+========================================================= */
+
+const level3 = [
+
+{
+q:"Decode this Caesar cipher with shift 5:",
+cipher:"MJQQT",
+type:"choice",
+options:["HELLO","WORLD","SECRET","CIPHER"],
+answer:"HELLO"
+},
+
+{
+q:"Decode this Caesar cipher with shift 7:",
+cipher:"JVU",
+type:"choice",
+options:["CON","DOG","CAT","YOU"],
+answer:"CON"
+},
+
+{
+q:"If the ciphertext is shifted 4 places forward, how do you decrypt it?",
+type:"choice",
+options:[
+"Move each letter 4 places backwards",
+"Move each letter 4 places forwards",
+"Reverse the alphabet",
+"Remove every fourth letter"
+],
+answer:"Move each letter 4 places backwards"
+},
+
+{
+q:"What is the most useful first step when solving an unknown substitution cipher?",
+type:"choice",
+options:[
+"Look at letter frequencies and word patterns",
+"Guess every letter randomly",
+"Remove all spaces",
+"Only look at the last letter"
+],
+answer:"Look at letter frequencies and word patterns"
+},
+
+{
+q:"A ciphertext contains the same three-letter word seven times. What is a good hypothesis?",
+type:"choice",
+options:[
+"It could be a common word such as THE",
+"It must be a person's name",
+"It cannot be important",
+"It must be a number"
+],
+answer:"It could be a common word such as THE"
+},
+
+{
+q:"If a ciphertext has the pattern ABCDA, which plaintext word could have the same pattern?",
+type:"choice",
+options:["THERE","HOUSE","APPLE","WORLD"],
+answer:"THERE"
+},
+
+{
+q:"Which word has the pattern 1-2-3-4-1?",
+type:"choice",
+options:["THERE","HOUSE","SHEEP","APPLE"],
+answer:"THERE"
+},
+
+{
+q:"If X = T, Q = H and Z = E, what does XQZ XQZ mean?",
+type:"choice",
+options:["THE THE","CAT CAT","YOU YOU","AND AND"],
+answer:"THE THE"
+},
+
+{
+q:"Why should you avoid assuming the most common ciphertext letter is definitely E?",
+type:"choice",
+options:[
+"The sample may be too small or the cipher may not be simple substitution",
+"E is never common",
+"Q can never mean E",
+"Frequency analysis does not work"
+],
+answer:"The sample may be too small or the cipher may not be simple substitution"
+},
+
+{
+q:"What is a transposition cipher?",
+type:"choice",
+options:[
+"A cipher that rearranges letters",
+"A cipher that replaces every letter",
+"A cipher using only numbers",
+"A cipher that removes vowels"
+],
+answer:"A cipher that rearranges letters"
+},
+
+{
+q:"In a transposition cipher, are the original letters normally changed?",
+type:"choice",
+options:[
+"No, they are rearranged",
+"Yes, every letter becomes another letter",
+"Only vowels change",
+"Only consonants change"
+],
+answer:"No, they are rearranged"
+},
+
+{
+q:"What is a substitution cipher?",
+type:"choice",
+options:[
+"A cipher where symbols replace other symbols",
+"A cipher where letters are only rearranged",
+"A cipher with no key",
+"A cipher using only spaces"
+],
+answer:"A cipher where symbols replace other symbols"
+},
+
+{
+q:"If ciphertext has many words with the pattern 1-2-3, what type of word might appear often?",
+type:"choice",
+options:["THE","CIPHER","MESSAGE","ENCRYPTION"],
+answer:"THE"
+},
+
+{
+q:"Which clue is strongest for identifying a one-letter English word?",
+type:"choice",
+options:["It is probably A or I","It is probably THE","It is probably CIPHER","It is probably HELLO"],
+answer:"It is probably A or I"
+},
+
+{
+q:"If a word appears as ABC and later ABCABC, what might this suggest?",
+type:"choice",
+options:[
+"The same word or pattern may be repeating",
+"The alphabet has changed",
+"The cipher is broken",
+"Nothing can be learned"
+],
+answer:"The same word or pattern may be repeating"
+},
+
+{
+q:"What is a key in cryptography?",
+type:"choice",
+options:[
+"Information used to encrypt or decrypt",
+"The longest word",
+"The first letter",
+"A random clue"
+],
+answer:"Information used to encrypt or decrypt"
+},
+
+{
+q:"Why can spaces be useful in ciphertext?",
+type:"choice",
+options:[
+"They reveal possible word lengths",
+"They reveal the exact key",
+"They always reveal E",
+"They make encryption impossible"
+],
+answer:"They reveal possible word lengths"
+},
+
+{
+q:"What can punctuation sometimes help identify?",
+type:"choice",
+options:[
+"Sentence structure and possible word boundaries",
+"The exact Caesar shift",
+"The password",
+"The encryption algorithm every time"
+],
+answer:"Sentence structure and possible word boundaries"
+},
+
+{
+q:"If two different ciphertext words have exactly the same pattern, what might be true?",
+type:"choice",
+options:[
+"Their plaintext words may share the same letter pattern",
+"They must mean the same thing",
+"They must be the same word",
+"They cannot be related"
+],
+answer:"Their plaintext words may share the same letter pattern"
+},
+
+{
+q:"What is cryptanalysis?",
+type:"choice",
+options:[
+"The study of breaking or analysing codes and ciphers",
+"The study of handwriting",
+"The study of keyboards",
+"The study of passwords only"
+],
+answer:"The study of breaking or analysing codes and ciphers"
+}
+
+];
+
+
+/* =========================================================
+   LEVEL 4 — HARD
+========================================================= */
+
+const level4 = [
+
+{
+q:"A substitution cipher contains the word QEF repeatedly. You suspect it means THE. What mapping would you test?",
+type:"choice",
+options:[
+"Q=T, E=H, F=E",
+"Q=E, E=T, F=H",
+"Q=H, E=E, F=T",
+"Q=A, E=B, F=C"
+],
+answer:"Q=T, E=H, F=E"
+},
+
+{
+q:"If the ciphertext contains QEF QEF, and QEF is suspected to be THE, what does the repeated phrase suggest?",
+type:"choice",
+options:["THE THE","A SECRET","THE CODE","GO GO"],
+answer:"THE THE"
+},
+
+{
+q:"A ciphertext's most common symbols are Q, M and X. What should you do?",
+type:"choice",
+options:[
+"Compare them with common English letters and test hypotheses",
+"Immediately declare Q=E, M=T and X=A",
+"Ignore frequencies completely",
+"Replace them randomly"
+],
+answer:"Compare them with common English letters and test hypotheses"
+},
+
+{
+q:"A substitution cipher has a one-letter word X. What are the strongest possibilities?",
+type:"choice",
+options:["A or I","THE or AND","OF or TO","IS or IT"],
+answer:"A or I"
+},
+
+{
+q:"A ciphertext contains the pattern ABCDABC. What should you investigate?",
+type:"choice",
+options:[
+"Whether a shorter repeated sequence occurs",
+"Only the first letter",
+"Only the last letter",
+"Whether it is definitely Caesar"
+],
+answer:"Whether a shorter repeated sequence occurs"
+},
+
+{
+q:"Which feature can strongly distinguish substitution from transposition?",
+type:"choice",
+options:[
+"Letter frequencies are usually preserved by transposition",
+"Spaces always disappear in substitution",
+"Substitution always uses numbers",
+"Transposition always changes letters"
+],
+answer:"Letter frequencies are usually preserved by transposition"
+},
+
+{
+q:"Why can frequency analysis work well on long substitution ciphertexts?",
+type:"choice",
+options:[
+"Statistical patterns become clearer with more text",
+"Long text always uses Caesar",
+"Every long word is THE",
+"Spaces reveal the key automatically"
+],
+answer:"Statistical patterns become clearer with more text"
+},
+
+{
+q:"What does a frequency spike for one symbol tell you?",
+type:"choice",
+options:[
+"It may represent a common plaintext letter",
+"It definitely represents E",
+"It cannot be a vowel",
+"It must represent A"
+],
+answer:"It may represent a common plaintext letter"
+},
+
+{
+q:"A word has the pattern 1-2-3-1-4. Which word fits?",
+type:"choice",
+options:["THERE","TRUST","TREAT","TUTOR"],
+answer:"TREAT"
+},
+
+{
+q:"A word has the pattern 1-2-3-2-4. Which word fits?",
+type:"choice",
+options:["HOUSE","THERE","APPLE","SHEEP"],
+answer:"HOUSE"
+},
+
+{
+q:"Why are repeated patterns useful in substitution cryptanalysis?",
+type:"choice",
+options:[
+"Letter relationships stay consistent",
+"Every repeated pattern means THE",
+"They reveal the Caesar shift automatically",
+"They remove the need for guessing"
+],
+answer:"Letter relationships stay consistent"
+},
+
+{
+q:"If the same ciphertext letter appears in two places, what must be true in a simple monoalphabetic substitution?",
+type:"choice",
+options:[
+"It represents the same plaintext letter",
+"It represents two different letters",
+"It must be E",
+"It must be a vowel"
+],
+answer:"It represents the same plaintext letter"
+},
+
+{
+q:"What is a monoalphabetic substitution cipher?",
+type:"choice",
+options:[
+"One fixed substitution alphabet is used throughout",
+"A new alphabet is used for every letter",
+"Only vowels are substituted",
+"Letters are rearranged randomly"
+],
+answer:"One fixed substitution alphabet is used throughout"
+},
+
+{
+q:"Why is guessing a single mapping not enough to solve a substitution cipher?",
+type:"choice",
+options:[
+"Other mappings must also remain consistent",
+"One mapping solves everything",
+"Mappings do not matter",
+"Every cipher has several correct plaintexts"
+],
+answer:"Other mappings must also remain consistent"
+},
+
+{
+q:"A suspected plaintext word creates a contradiction with a previously solved letter. What should you do?",
+type:"choice",
+options:[
+"Reconsider the hypothesis",
+"Ignore the contradiction",
+"Change the plaintext alphabet",
+"Delete the ciphertext"
+],
+answer:"Reconsider the hypothesis"
+},
+
+{
+q:"What is a crib especially useful for?",
+type:"choice",
+options:[
+"Testing a suspected word or phrase",
+"Counting the number of spaces",
+"Making ciphertext longer",
+"Changing a Caesar cipher into Atbash"
+],
+answer:"Testing a suspected word or phrase"
+},
+
+{
+q:"If a ciphertext begins with the same three symbols several times, what could that indicate?",
+type:"choice",
+options:[
+"A repeated word or phrase",
+"That the cipher is definitely Caesar",
+"That the message is random",
+"That every symbol means E"
+],
+answer:"A repeated word or phrase"
+},
+
+{
+q:"Which combination gives the strongest evidence for a substitution hypothesis?",
+type:"choice",
+options:[
+"Word pattern + frequency + consistent mappings",
+"One guessed letter",
+"Only the first word",
+"Only the most common symbol"
+],
+answer:"Word pattern + frequency + consistent mappings"
+},
+
+{
+q:"Why can short ciphertexts be difficult to solve using frequency analysis?",
+type:"choice",
+options:[
+"There may not be enough data for reliable frequencies",
+"Short text cannot contain letters",
+"Frequency analysis only works on numbers",
+"Short text is always encrypted twice"
+],
+answer:"There may not be enough data for reliable frequencies"
+},
+
+{
+q:"A cipher has spaces preserved, a one-letter word and a repeated three-letter word. What should you examine first?",
+type:"choice",
+options:[
+"The one-letter word and repeated three-letter word",
+"Only the longest word",
+"Only punctuation",
+"Nothing until every letter is guessed"
+],
+answer:"The one-letter word and repeated three-letter word"
+}
+
+];
+
+
+/* =========================================================
+   LEVEL 5 — CIPHER MASTER
+========================================================= */
+
+const level5 = [
+
+{
+q:"A substitution cipher contains the pattern ABCADE. Which plaintext word could match it?",
+type:"choice",
+options:["PLANET","PEOPLE","BANANA","SECRET"],
+answer:"PLANET"
+},
+
+{
+q:"A ciphertext contains a one-letter word followed by a repeated three-letter word. Which sentence pattern could this represent?",
+type:"choice",
+options:["I THE THE","THE A","CIPHER CODE","HELLO WORLD"],
+answer:"I THE THE"
+},
+
+{
+q:"You hypothesise that XYZ = THE. Later, you discover X must equal A. What does this mean?",
+type:"choice",
+options:[
+"The hypothesis is probably wrong",
+"The hypothesis is definitely correct",
+"X can represent both A and T",
+"The cipher must be Atbash"
+],
+answer:"The hypothesis is probably wrong"
+},
+
+{
+q:"Why is consistency one of the most important ideas in substitution cryptanalysis?",
+type:"choice",
+options:[
+"A symbol should keep the same meaning throughout a monoalphabetic cipher",
+"Symbols can change meaning whenever convenient",
+"Only vowels need consistent mappings",
+"Consistency is not important"
+],
+answer:"A symbol should keep the same meaning throughout a monoalphabetic cipher"
+},
+
+{
+q:"A ciphertext has a very frequent two-letter combination. Which English combinations might be worth testing?",
+type:"choice",
+options:["TH, HE, IN, ER","QZ, ZX, XQ","AA, BB, CC only","XX, QQ, ZZ only"],
+answer:"TH, HE, IN, ER"
+},
+
+{
+q:"Which is a weakness of relying only on English letter frequency?",
+type:"choice",
+options:[
+"The text may be too short or unusual",
+"E is never common",
+"Frequency always gives the exact answer",
+"Frequency cannot be measured"
+],
+answer:"The text may be too short or unusual"
+},
+
+{
+q:"If a cipher preserves spaces but rearranges letters inside each group, what kind of cipher might it be?",
+type:"choice",
+options:["A transposition cipher","A substitution cipher","A Caesar cipher","An Atbash cipher"],
+answer:"A transposition cipher"
+},
+
+{
+q:"If the same ciphertext letter occurs many times but seems to have different plaintext meanings, what should you suspect?",
+type:"choice",
+options:[
+"It may not be a simple monoalphabetic substitution",
+"The cipher is definitely Caesar",
+"The letter must be E",
+"The plaintext is incorrect every time"
+],
+answer:"It may not be a simple monoalphabetic substitution"
+},
+
+{
+q:"What is the main difference between encryption and cryptanalysis?",
+type:"choice",
+options:[
+"Encryption hides information; cryptanalysis analyses or breaks ciphers",
+"They mean exactly the same thing",
+"Encryption only uses numbers",
+"Cryptanalysis only means making passwords"
+],
+answer:"Encryption hides information; cryptanalysis analyses or breaks ciphers"
+},
+
+{
+q:"A ciphertext contains many repeated four-letter words. What should you investigate?",
+type:"choice",
+options:[
+"Whether the repeated word is a common plaintext word",
+"Whether every word is a name",
+"Whether the message contains no vowels",
+"Whether the letters are random"
+],
+answer:"Whether the repeated word is a common plaintext word"
+},
+
+{
+q:"If the ciphertext pattern for a word is 1-2-3-4-5-1, which word could fit?",
+type:"choice",
+options:["PLANET","PEOPLE","SECRET","BANANA"],
+answer:"PLANET"
+},
+
+{
+q:"If the ciphertext pattern is 1-2-3-2-4-5, which word could fit?",
+type:"choice",
+options:["TREATY","PLANET","SECRET","PEOPLE"],
+answer:"TREATY"
+},
+
+{
+q:"You have guessed THE correctly in a substitution cipher. What should you do next?",
+type:"choice",
+options:[
+"Use its letter mappings to test other words",
+"Assume every unknown letter is solved",
+"Stop solving",
+"Change the key randomly"
+],
+answer:"Use its letter mappings to test other words"
+},
+
+{
+q:"Why are common short words valuable clues?",
+type:"choice",
+options:[
+"There are relatively few common possibilities",
+"They always reveal the entire cipher",
+"They contain every letter",
+"They cannot be encrypted"
+],
+answer:"There are relatively few common possibilities"
+},
+
+{
+q:"What does a contradiction in a cipher solution usually indicate?",
+type:"choice",
+options:[
+"At least one earlier assumption may be wrong",
+"The ciphertext is automatically impossible",
+"The alphabet has 27 letters",
+"The answer must be correct"
+],
+answer:"At least one earlier assumption may be wrong"
+},
+
+{
+q:"A ciphertext has unusually high frequency for one letter, but the message is only 20 characters long. How confident should you be?",
+type:"choice",
+options:["Not very confident","Completely certain","100% certain","No analysis is possible"],
+answer:"Not very confident"
+},
+
+{
+q:"Which strategy is generally strongest for a difficult substitution cipher?",
+type:"choice",
+options:[
+"Combine patterns, frequencies, word lengths and hypotheses",
+"Only guess the most common letter",
+"Only decode the first word",
+"Randomly replace letters"
+],
+answer:"Combine patterns, frequencies, word lengths and hypotheses"
+},
+
+{
+q:"What happens if you correctly identify one letter in a monoalphabetic substitution cipher?",
+type:"choice",
+options:[
+"That mapping can be applied everywhere that symbol appears",
+"Only the first occurrence changes",
+"The entire cipher is solved",
+"Nothing useful happens"
+],
+answer:"That mapping can be applied everywhere that symbol appears"
+},
+
+{
+q:"A repeated ciphertext word appears at the beginning and end of a sentence. What might this suggest?",
+type:"choice",
+options:[
+"It may be the same plaintext word in both places",
+"It must be a person's name",
+"It cannot be important",
+"The cipher is broken"
+],
+answer:"It may be the same plaintext word in both places"
+},
+
+{
+q:"FINAL CHALLENGE: You find a one-letter word, a repeated three-letter word, a repeated five-letter pattern, and one very common ciphertext symbol. What should you investigate first?",
+type:"choice",
+options:[
+"The one-letter word, repeated word and frequency together",
+"Only the most common symbol",
+"Only the longest word",
+"Nothing until you know the entire key"
+],
+answer:"The one-letter word, repeated word and frequency together"
+}
+
+];
+
+
+/* =========================================================
+   QUIZ ENGINE
+========================================================= */
+
+const levels = [
+    {
+        name: "🟢 Level 1 — Beginner",
+        questions: level1
+    },
+    {
+        name: "🔵 Level 2 — Easy",
+        questions: level2
+    },
+    {
+        name: "🟡 Level 3 — Medium",
+        questions: level3
+    },
+    {
+        name: "🟠 Level 4 — Hard",
+        questions: level4
+    },
+    {
+        name: "🔴 Level 5 — Cipher Master",
+        questions: level5
+    }
+];
+
+let currentLevel = 0;
 let currentQuestion = 0;
 let score = 0;
 let answered = false;
 
-const questionArea = document.getElementById("questionArea");
-const questionNumber = document.getElementById("questionNumber");
-const scoreDisplay = document.getElementById("score");
-const progress = document.getElementById("progress");
-const feedback = document.getElementById("feedback");
-const submitButton = document.getElementById("submitButton");
-const nextButton = document.getElementById("nextButton");
-const quizCard = document.getElementById("quizCard");
-const finalScreen = document.getElementById("finalScreen");
-const finalScore = document.getElementById("finalScore");
-const rating = document.getElementById("rating");
 
-function loadQuestion() {
+/* START LEVEL */
+
+function startLevel(level) {
+
+    currentLevel = level;
+    currentQuestion = 0;
+    score = 0;
+    answered = false;
+
+    document.getElementById("levelScreen").style.display = "none";
+    document.getElementById("resultScreen").style.display = "none";
+    document.getElementById("quizScreen").style.display = "block";
+
+    document.getElementById("levelName").textContent =
+        levels[currentLevel].name;
+
+    showQuestion();
+}
+
+
+/* SHOW QUESTION */
+
+function showQuestion() {
 
     answered = false;
 
-    const q = questions[currentQuestion];
+    const question =
+        levels[currentLevel].questions[currentQuestion];
 
-    questionNumber.textContent =
-        `Question ${currentQuestion + 1} of ${questions.length}`;
+    document.getElementById("questionNumber").textContent =
+        "Question " + (currentQuestion + 1) + " / 20";
 
-    scoreDisplay.textContent =
-        `Score: ${score}`;
+    document.getElementById("progressBar").style.width =
+        ((currentQuestion) / 20 * 100) + "%";
 
-    progress.style.width =
-        ((currentQuestion) / questions.length * 100) + "%";
+    document.getElementById("question").textContent =
+        question.q;
 
-    feedback.className = "feedback";
-    feedback.innerHTML = "";
+    const cipherBox = document.getElementById("cipherText");
 
-    nextButton.classList.add("hidden");
-    submitButton.classList.remove("hidden");
-
-    let html = `
-        <div class="question">${q.question}</div>
-    `;
-
-    if (q.cipher) {
-        html += `
-            <div class="cipher-text">${q.cipher}</div>
-        `;
+    if (question.cipher) {
+        cipherBox.style.display = "block";
+        cipherBox.textContent = question.cipher;
+    } else {
+        cipherBox.style.display = "none";
     }
 
-    if (q.type === "text") {
+    const answers = document.getElementById("answers");
+    answers.innerHTML = "";
 
-        html += `
-            <input
-                type="text"
-                id="textAnswer"
-                class="text-answer"
-                placeholder="Type your answer..."
-                autocomplete="off"
-            >
-        `;
+    if (question.type === "choice") {
+
+        const options = [...question.options];
+
+        options.forEach(option => {
+
+            const button = document.createElement("button");
+
+            button.className = "option";
+            button.textContent = option;
+
+            button.onclick = function() {
+                chooseAnswer(button, option);
+            };
+
+            answers.appendChild(button);
+        });
 
     } else {
 
-        html += `<div class="options">`;
+        const input = document.createElement("input");
 
-        q.options.forEach((option, index) => {
+        input.type = "text";
+        input.id = "textAnswer";
+        input.placeholder = "Type your answer...";
 
-            html += `
-                <button
-                    class="option"
-                    onclick="selectOption(${index})"
-                    id="option${index}"
-                >
-                    ${option}
-                </button>
-            `;
+        input.addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                submitAnswer();
+            }
 
         });
 
-        html += `</div>`;
+        answers.appendChild(input);
     }
 
-    questionArea.innerHTML = html;
+    document.getElementById("feedback").className = "feedback";
+    document.getElementById("feedback").textContent = "";
+
+    document.getElementById("submitBtn").style.display =
+        question.type === "text" ? "inline-block" : "none";
+
+    document.getElementById("nextBtn").style.display = "none";
 }
 
-let selectedOption = null;
 
-function selectOption(index) {
+/* CHOOSE MULTIPLE CHOICE ANSWER */
+
+function chooseAnswer(button, answer) {
 
     if (answered) return;
 
-    selectedOption = index;
-
-    document.querySelectorAll(".option").forEach(button => {
-        button.classList.remove("selected");
-    });
-
-    document.getElementById("option" + index)
-        .classList.add("selected");
+    checkAnswer(answer);
 }
 
-submitButton.addEventListener("click", checkAnswer);
 
-function checkAnswer() {
+/* SUBMIT TEXT ANSWER */
+
+function submitAnswer() {
 
     if (answered) return;
 
-    const q = questions[currentQuestion];
+    const input = document.getElementById("textAnswer");
 
-    let correct = false;
+    if (!input) return;
 
-    if (q.type === "text") {
+    const answer = input.value.trim();
 
-        const input =
-            document.getElementById("textAnswer");
-
-        if (!input || input.value.trim() === "") {
-            alert("Type an answer first!");
-            return;
-        }
-
-        const userAnswer =
-            input.value.trim()
-                .toUpperCase()
-                .replace(/\s+/g, " ");
-
-        const correctAnswer =
-            q.answer.toUpperCase();
-
-        correct = userAnswer === correctAnswer;
-
-        input.disabled = true;
-
-    } else {
-
-        if (selectedOption === null) {
-            alert("Choose an answer first!");
-            return;
-        }
-
-        correct = selectedOption === q.answer;
-
-        document.querySelectorAll(".option").forEach(
-            (button, index) => {
-
-                button.disabled = true;
-
-                if (index === q.answer) {
-                    button.classList.add("correct");
-                }
-
-                if (
-                    index === selectedOption &&
-                    selectedOption !== q.answer
-                ) {
-                    button.classList.add("wrong");
-                }
-            }
-        );
+    if (answer === "") {
+        return;
     }
+
+    checkAnswer(answer);
+}
+
+
+/* CHECK ANSWER */
+
+function checkAnswer(answer) {
+
+    if (answered) return;
 
     answered = true;
 
-    if (correct) {
+    const question =
+        levels[currentLevel].questions[currentQuestion];
+
+    const correctAnswer =
+        question.answer;
+
+    const normalAnswer =
+        answer.trim().toUpperCase();
+
+    const normalCorrect =
+        correctAnswer.trim().toUpperCase();
+
+    const isCorrect =
+        normalAnswer === normalCorrect;
+
+    const feedback =
+        document.getElementById("feedback");
+
+    if (isCorrect) {
 
         score++;
 
-        feedback.className =
-            "feedback correct-feedback";
+        feedback.className = "feedback correct";
 
         feedback.innerHTML =
-            "✅ <strong>Correct!</strong> " +
-            q.explanation;
+            "✅ <strong>Correct!</strong><br>" +
+            "Great work!";
 
     } else {
 
-        feedback.className =
-            "feedback wrong-feedback";
+        feedback.className = "feedback wrong";
 
         feedback.innerHTML =
-            "❌ <strong>Not quite!</strong> " +
-            q.explanation;
+            "❌ <strong>Not quite!</strong><br>" +
+            "The correct answer was: <strong>" +
+            correctAnswer +
+            "</strong>";
     }
 
-    scoreDisplay.textContent =
-        `Score: ${score}`;
+    feedback.style.display = "block";
 
-    submitButton.classList.add("hidden");
+    if (question.type === "choice") {
 
-    if (currentQuestion < questions.length - 1) {
+        const buttons =
+            document.querySelectorAll(".option");
 
-        nextButton.classList.remove("hidden");
+        buttons.forEach(button => {
 
-    } else {
+            button.disabled = true;
 
-        nextButton.textContent =
-            "See Final Score 🏆";
+            if (
+                button.textContent.trim().toUpperCase() ===
+                normalCorrect
+            ) {
+                button.classList.add("correct");
+            }
 
-        nextButton.classList.remove("hidden");
+            if (
+                button.textContent.trim().toUpperCase() ===
+                normalAnswer &&
+                !isCorrect
+            ) {
+                button.classList.add("wrong");
+            }
+        });
     }
+
+    document.getElementById("submitBtn").style.display = "none";
+    document.getElementById("nextBtn").style.display = "inline-block";
 }
 
-nextButton.addEventListener("click", nextQuestion);
+
+/* NEXT QUESTION */
 
 function nextQuestion() {
 
-    if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
 
-        currentQuestion++;
-
-        selectedOption = null;
-
-        loadQuestion();
-
+    if (currentQuestion >= 20) {
+        finishLevel();
     } else {
-
-        showFinalScreen();
+        showQuestion();
     }
 }
 
-function showFinalScreen() {
 
-    quizCard.style.display = "none";
-    finalScreen.style.display = "block";
+/* FINISH LEVEL */
 
-    finalScore.textContent =
-        `${score} / ${questions.length}`;
+function finishLevel() {
 
-    const percentage =
-        Math.round((score / questions.length) * 100);
+    document.getElementById("quizScreen").style.display = "none";
+    document.getElementById("resultScreen").style.display = "block";
+
+    document.getElementById("finalScore").textContent =
+        score + " / 20";
 
     let message = "";
 
-    if (percentage === 100) {
-
+    if (score === 20) {
         message =
-            "🏆 PERFECT SCORE! Your team is ready for some serious codebreaking.";
-
-    } else if (percentage >= 80) {
-
+            "🏆 PERFECT SCORE! You are a true Cipher Master!";
+    } else if (score >= 17) {
         message =
-            "🔥 Excellent! Your team has strong cipher skills.";
-
-    } else if (percentage >= 60) {
-
+            "🔥 Amazing! You clearly know your ciphers!";
+    } else if (score >= 14) {
         message =
-            "🕵️ Good work! A little more practice and you'll be dangerous.";
-
-    } else if (percentage >= 40) {
-
+            "👏 Great job! You're getting seriously good!";
+    } else if (score >= 10) {
         message =
-            "🔎 Not bad! Keep practising frequency analysis and substitution.";
-
+            "👍 Good work! Keep practising and you'll improve.";
+    } else if (score >= 5) {
+        message =
+            "🧠 Not bad! Try the level again and look carefully at the clues.";
     } else {
-
         message =
-            "📚 Time for some more training! Try the quiz again and work together.";
+            "🔐 Keep practising! Cipher solving gets easier with experience.";
     }
 
-    rating.innerHTML =
-        `${percentage}%<br><br>${message}`;
+    document.getElementById("resultMessage").textContent =
+        message;
 }
 
-function restartQuiz() {
 
-    currentQuestion = 0;
-    score = 0;
-    selectedOption = null;
-    answered = false;
+/* RESTART CURRENT LEVEL */
 
-    finalScreen.style.display = "none";
-    quizCard.style.display = "block";
-
-    loadQuestion();
+function restartLevel() {
+    startLevel(currentLevel);
 }
 
-loadQuestion();
+
+/* BACK TO LEVELS */
+
+function backToLevels() {
+
+    document.getElementById("quizScreen").style.display = "none";
+    document.getElementById("resultScreen").style.display = "none";
+    document.getElementById("levelScreen").style.display = "block";
+
+}
 
 </script>
 
