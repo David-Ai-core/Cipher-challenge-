@@ -1,0 +1,821 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>National Cipher Challenge</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #10141c;
+        color: #ffffff;
+        min-height: 100vh;
+    }
+
+    .header {
+        background: #171d29;
+        border-bottom: 1px solid #303847;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+
+    .header p {
+        margin: 8px 0 0;
+        color: #aeb7c7;
+    }
+
+    .container {
+        width: min(900px, 92%);
+        margin: 35px auto;
+    }
+
+    .quiz-card {
+        background: #191f2b;
+        border: 1px solid #303847;
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+
+    .top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 15px;
+    }
+
+    .question-number {
+        color: #7db7ff;
+        font-weight: bold;
+    }
+
+    .score {
+        color: #aeb7c7;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 8px;
+        background: #303847;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .progress {
+        height: 100%;
+        width: 0%;
+        background: #4c9aff;
+        transition: width 0.3s;
+    }
+
+    .question {
+        font-size: 23px;
+        line-height: 1.5;
+        margin-bottom: 25px;
+        white-space: pre-line;
+    }
+
+    .cipher-text {
+        background: #0d1118;
+        border: 1px solid #343d4d;
+        padding: 18px;
+        border-radius: 10px;
+        font-family: "Courier New", monospace;
+        font-size: 20px;
+        margin: 15px 0 25px;
+        word-break: break-word;
+    }
+
+    .options {
+        display: grid;
+        gap: 12px;
+    }
+
+    .option {
+        width: 100%;
+        text-align: left;
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid #3a4353;
+        background: #222936;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+
+    .option:hover {
+        background: #2b3444;
+        border-color: #5b9fff;
+        transform: translateY(-1px);
+    }
+
+    .option.selected {
+        border-color: #5b9fff;
+        background: #263c5c;
+    }
+
+    .option.correct {
+        background: #174d32;
+        border-color: #37c77a;
+    }
+
+    .option.wrong {
+        background: #5a2025;
+        border-color: #ff5b68;
+    }
+
+    .text-answer {
+        width: 100%;
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid #3a4353;
+        background: #0f141c;
+        color: white;
+        font-size: 18px;
+        outline: none;
+    }
+
+    .text-answer:focus {
+        border-color: #5b9fff;
+    }
+
+    .submit-button,
+    .next-button,
+    .restart-button {
+        margin-top: 22px;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 10px;
+        background: #4c9aff;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .submit-button:hover,
+    .next-button:hover,
+    .restart-button:hover {
+        background: #367fdc;
+    }
+
+    .feedback {
+        margin-top: 18px;
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        line-height: 1.5;
+    }
+
+    .feedback.correct-feedback {
+        display: block;
+        background: #143b28;
+        border: 1px solid #2ebd70;
+        color: #9ff0c4;
+    }
+
+    .feedback.wrong-feedback {
+        display: block;
+        background: #481b20;
+        border: 1px solid #e44b58;
+        color: #ffb0b7;
+    }
+
+    .final-screen {
+        text-align: center;
+        display: none;
+    }
+
+    .final-screen h2 {
+        font-size: 35px;
+        margin-bottom: 10px;
+    }
+
+    .final-score {
+        font-size: 65px;
+        font-weight: bold;
+        color: #62a8ff;
+        margin: 25px 0;
+    }
+
+    .rating {
+        color: #b9c2d0;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media (max-width: 600px) {
+        .quiz-card {
+            padding: 20px;
+        }
+
+        .question {
+            font-size: 19px;
+        }
+
+        .cipher-text {
+            font-size: 17px;
+        }
+
+        .header h1 {
+            font-size: 23px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🔐 National Cipher Challenge</h1>
+    <p>Team Training Quiz</p>
+</div>
+
+<div class="container">
+
+    <div class="quiz-card" id="quizCard">
+
+        <div class="top-row">
+            <div class="question-number" id="questionNumber">
+                Question 1 of 20
+            </div>
+
+            <div class="score" id="score">
+                Score: 0
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div id="questionArea"></div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <button id="submitButton" class="submit-button">
+            Check Answer
+        </button>
+
+        <button id="nextButton" class="next-button hidden">
+            Next Question →
+        </button>
+
+    </div>
+
+    <div class="quiz-card final-screen" id="finalScreen">
+
+        <h2>🏆 Quiz Complete!</h2>
+
+        <p>Your final score:</p>
+
+        <div class="final-score" id="finalScore">
+            0 / 20
+        </div>
+
+        <div class="rating" id="rating"></div>
+
+        <button class="restart-button" onclick="restartQuiz()">
+            Try Again
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+
+    {
+        question: "Decode this Caesar cipher using a shift of 3:",
+        cipher: "KHOOR",
+        type: "text",
+        answer: "HELLO",
+        explanation: "Each letter is moved 3 places backwards: K→H, H→E, O→L, O→L, R→O."
+    },
+
+    {
+        question: "Decode this Caesar cipher using a shift of 3:",
+        cipher: "WKH VHFUHW",
+        type: "text",
+        answer: "THE SECRET",
+        explanation: "Move every letter 3 places backwards to reveal THE SECRET."
+    },
+
+    {
+        question: "If D encrypts to G, what shift is being used?",
+        type: "options",
+        options: [
+            "A shift of 1",
+            "A shift of 2",
+            "A shift of 3",
+            "A shift of 4"
+        ],
+        answer: 2,
+        explanation: "D → E → F → G, so the encryption shift is 3."
+    },
+
+    {
+        question: "Using the Atbash cipher, where A↔Z, B↔Y and C↔X, decode:",
+        cipher: "GSV",
+        type: "text",
+        answer: "THE",
+        explanation: "Atbash reverses the alphabet. G becomes T, S becomes H and V becomes E."
+    },
+
+    {
+        question: "Encode the word CIPHER using the Atbash cipher.",
+        type: "text",
+        answer: "XRKSVI",
+        explanation: "C→X, I→R, P→K, H→S, E→V and R→I."
+    },
+
+    {
+        question: "In an English substitution cipher, which letter is often the most common?",
+        type: "options",
+        options: [
+            "Q",
+            "E",
+            "X",
+            "Z"
+        ],
+        answer: 1,
+        explanation: "E is commonly the most frequent letter in English, making it useful in frequency analysis."
+    },
+
+    {
+        question: "The ciphertext contains the pattern XQX. What useful thing can you learn from the repeated letters?",
+        type: "options",
+        options: [
+            "The first and third plaintext letters are probably the same",
+            "The word must contain three different letters",
+            "The word must be exactly THE",
+            "The cipher must be a Caesar cipher"
+        ],
+        answer: 0,
+        explanation: "In a simple substitution cipher, the same ciphertext letter normally represents the same plaintext letter."
+    },
+
+    {
+        question: "A ciphertext word has the pattern 1-2-3-3-2. Which English word has the same letter pattern?",
+        type: "options",
+        options: [
+            "SHEEP",
+            "APPLE",
+            "LEVEL",
+            "THERE"
+        ],
+        answer: 0,
+        explanation: "SHEEP has S-H-E-E-P, giving the pattern 1-2-3-3-2."
+    },
+
+    {
+        question: "If X = T, Q = H and Z = E, what does XQZ represent?",
+        type: "options",
+        options: [
+            "THE",
+            "TEE",
+            "THA",
+            "HET"
+        ],
+        answer: 0,
+        explanation: "Replacing X with T, Q with H and Z with E gives THE."
+    },
+
+    {
+        question: "If GSR represents THE, what can you immediately learn?",
+        type: "options",
+        options: [
+            "G represents T, S represents H and R represents E",
+            "G represents H, S represents E and R represents T",
+            "The cipher must be Caesar",
+            "The message cannot be solved"
+        ],
+        answer: 0,
+        explanation: "A known plaintext word gives you three useful letter substitutions."
+    },
+
+    {
+        question: "Decode this message using the same substitution where GSR = THE:",
+        cipher: "GSR RH Z HVXIVG",
+        type: "text",
+        answer: "THE IS A SECRET",
+        explanation: "The substitution maps the ciphertext to THE IS A SECRET."
+    },
+
+    {
+        question: "A ciphertext contains the words ABCD EFGH IJKL EFGH MNOP. What should you investigate first?",
+        type: "options",
+        options: [
+            "The repeated word EFGH",
+            "The colour of the paper",
+            "The longest word",
+            "The number of spaces"
+        ],
+        answer: 0,
+        explanation: "Repeated words can reveal repeated plaintext words and provide useful substitution clues."
+    },
+
+    {
+        question: "You suspect that the word THE appears somewhere in a substitution cipher. What technique could you use to test this idea?",
+        type: "options",
+        options: [
+            "A crib",
+            "Random guessing",
+            "Changing the font",
+            "Counting spaces only"
+        ],
+        answer: 0,
+        explanation: "A crib is a guessed piece of plaintext used to help break a cipher."
+    },
+
+    {
+        question: "Decode this Caesar cipher:",
+        cipher: "YMJ XJHWJY NX MNIJY",
+        type: "text",
+        answer: "THE SECRET IS HIDET",
+        explanation: "This ciphertext uses a Caesar shift of 5. Note that the final word is intentionally HIDET, so check your answer carefully."
+    },
+
+    {
+        question: "A cipher contains a one-letter word. Which two possibilities are especially common in English?",
+        type: "options",
+        options: [
+            "A and I",
+            "B and C",
+            "X and Z",
+            "Q and J"
+        ],
+        answer: 0,
+        explanation: "A and I are the two common one-letter words in English."
+    },
+
+    {
+        question: "The ciphertext contains ABBCD EFGHI ABBCD. What important clue does the repeated first and third word give you?",
+        type: "options",
+        options: [
+            "Those two ciphertext words probably represent the same plaintext word",
+            "The cipher is definitely Caesar",
+            "The message contains no vowels",
+            "The repeated word must mean THE"
+        ],
+        answer: 0,
+        explanation: "In many substitution systems, identical ciphertext words correspond to identical plaintext words."
+    },
+
+    {
+        question: "In a transposition cipher, are the letters usually changed or rearranged?",
+        type: "options",
+        options: [
+            "Changed",
+            "Rearranged",
+            "Deleted",
+            "Translated into numbers"
+        ],
+        answer: 1,
+        explanation: "Transposition ciphers rearrange the positions of letters rather than replacing them with different letters."
+    },
+
+    {
+        question: "You have a very long ciphertext with no spaces. What would make frequency analysis harder?",
+        type: "options",
+        options: [
+            "Not knowing where words begin and end",
+            "Having too many spaces",
+            "Having capital letters",
+            "Knowing the alphabet"
+        ],
+        answer: 0,
+        explanation: "Without spaces, it is harder to identify word patterns and common words."
+    },
+
+    {
+        question: "The most common ciphertext letter is Q. Does that prove Q = E?",
+        type: "options",
+        options: [
+            "Yes, always",
+            "No, frequency is only a clue",
+            "Yes, but only in Caesar ciphers",
+            "No, because E never appears in English"
+        ],
+        answer: 1,
+        explanation: "E is often the most common English letter, but frequency alone does not prove that Q represents E."
+    },
+
+    {
+        question: "FINAL BOSS: A ciphertext has a frequently repeated 3-letter word, a repeated 4-letter pattern, a one-letter word and Q as its most common letter. What should your team investigate first?",
+        type: "options",
+        options: [
+            "Repeated words and letter frequencies",
+            "The colour of the page",
+            "Only the rarest letter",
+            "The number of characters in the alphabet"
+        ],
+        answer: 0,
+        explanation: "Repeated words, word patterns and letter frequencies provide several useful clues that can be tested against each other."
+    }
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+const questionArea = document.getElementById("questionArea");
+const questionNumber = document.getElementById("questionNumber");
+const scoreDisplay = document.getElementById("score");
+const progress = document.getElementById("progress");
+const feedback = document.getElementById("feedback");
+const submitButton = document.getElementById("submitButton");
+const nextButton = document.getElementById("nextButton");
+const quizCard = document.getElementById("quizCard");
+const finalScreen = document.getElementById("finalScreen");
+const finalScore = document.getElementById("finalScore");
+const rating = document.getElementById("rating");
+
+function loadQuestion() {
+
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    questionNumber.textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    scoreDisplay.textContent =
+        `Score: ${score}`;
+
+    progress.style.width =
+        ((currentQuestion) / questions.length * 100) + "%";
+
+    feedback.className = "feedback";
+    feedback.innerHTML = "";
+
+    nextButton.classList.add("hidden");
+    submitButton.classList.remove("hidden");
+
+    let html = `
+        <div class="question">${q.question}</div>
+    `;
+
+    if (q.cipher) {
+        html += `
+            <div class="cipher-text">${q.cipher}</div>
+        `;
+    }
+
+    if (q.type === "text") {
+
+        html += `
+            <input
+                type="text"
+                id="textAnswer"
+                class="text-answer"
+                placeholder="Type your answer..."
+                autocomplete="off"
+            >
+        `;
+
+    } else {
+
+        html += `<div class="options">`;
+
+        q.options.forEach((option, index) => {
+
+            html += `
+                <button
+                    class="option"
+                    onclick="selectOption(${index})"
+                    id="option${index}"
+                >
+                    ${option}
+                </button>
+            `;
+
+        });
+
+        html += `</div>`;
+    }
+
+    questionArea.innerHTML = html;
+}
+
+let selectedOption = null;
+
+function selectOption(index) {
+
+    if (answered) return;
+
+    selectedOption = index;
+
+    document.querySelectorAll(".option").forEach(button => {
+        button.classList.remove("selected");
+    });
+
+    document.getElementById("option" + index)
+        .classList.add("selected");
+}
+
+submitButton.addEventListener("click", checkAnswer);
+
+function checkAnswer() {
+
+    if (answered) return;
+
+    const q = questions[currentQuestion];
+
+    let correct = false;
+
+    if (q.type === "text") {
+
+        const input =
+            document.getElementById("textAnswer");
+
+        if (!input || input.value.trim() === "") {
+            alert("Type an answer first!");
+            return;
+        }
+
+        const userAnswer =
+            input.value.trim()
+                .toUpperCase()
+                .replace(/\s+/g, " ");
+
+        const correctAnswer =
+            q.answer.toUpperCase();
+
+        correct = userAnswer === correctAnswer;
+
+        input.disabled = true;
+
+    } else {
+
+        if (selectedOption === null) {
+            alert("Choose an answer first!");
+            return;
+        }
+
+        correct = selectedOption === q.answer;
+
+        document.querySelectorAll(".option").forEach(
+            (button, index) => {
+
+                button.disabled = true;
+
+                if (index === q.answer) {
+                    button.classList.add("correct");
+                }
+
+                if (
+                    index === selectedOption &&
+                    selectedOption !== q.answer
+                ) {
+                    button.classList.add("wrong");
+                }
+            }
+        );
+    }
+
+    answered = true;
+
+    if (correct) {
+
+        score++;
+
+        feedback.className =
+            "feedback correct-feedback";
+
+        feedback.innerHTML =
+            "✅ <strong>Correct!</strong> " +
+            q.explanation;
+
+    } else {
+
+        feedback.className =
+            "feedback wrong-feedback";
+
+        feedback.innerHTML =
+            "❌ <strong>Not quite!</strong> " +
+            q.explanation;
+    }
+
+    scoreDisplay.textContent =
+        `Score: ${score}`;
+
+    submitButton.classList.add("hidden");
+
+    if (currentQuestion < questions.length - 1) {
+
+        nextButton.classList.remove("hidden");
+
+    } else {
+
+        nextButton.textContent =
+            "See Final Score 🏆";
+
+        nextButton.classList.remove("hidden");
+    }
+}
+
+nextButton.addEventListener("click", nextQuestion);
+
+function nextQuestion() {
+
+    if (currentQuestion < questions.length - 1) {
+
+        currentQuestion++;
+
+        selectedOption = null;
+
+        loadQuestion();
+
+    } else {
+
+        showFinalScreen();
+    }
+}
+
+function showFinalScreen() {
+
+    quizCard.style.display = "none";
+    finalScreen.style.display = "block";
+
+    finalScore.textContent =
+        `${score} / ${questions.length}`;
+
+    const percentage =
+        Math.round((score / questions.length) * 100);
+
+    let message = "";
+
+    if (percentage === 100) {
+
+        message =
+            "🏆 PERFECT SCORE! Your team is ready for some serious codebreaking.";
+
+    } else if (percentage >= 80) {
+
+        message =
+            "🔥 Excellent! Your team has strong cipher skills.";
+
+    } else if (percentage >= 60) {
+
+        message =
+            "🕵️ Good work! A little more practice and you'll be dangerous.";
+
+    } else if (percentage >= 40) {
+
+        message =
+            "🔎 Not bad! Keep practising frequency analysis and substitution.";
+
+    } else {
+
+        message =
+            "📚 Time for some more training! Try the quiz again and work together.";
+    }
+
+    rating.innerHTML =
+        `${percentage}%<br><br>${message}`;
+}
+
+function restartQuiz() {
+
+    currentQuestion = 0;
+    score = 0;
+    selectedOption = null;
+    answered = false;
+
+    finalScreen.style.display = "none";
+    quizCard.style.display = "block";
+
+    loadQuestion();
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
+```
